@@ -12,13 +12,6 @@ let count = 0;
  * nodes for UI updates.
  */
 
-const transportMap: Map<string, HTMLElement> = new Map([
-  ['t1', document.getElementById('t1')],
-  ['t2', document.getElementById('t2')],
-  ['t3', document.getElementById('t3')],
-  ['t4', document.getElementById('t4')],
-])
-
 const a = document.getElementById('a');
 const aMap: Map<string, HTMLInputElement> = new Map([
   ['a1', document.getElementById('a1') as HTMLInputElement],
@@ -35,31 +28,61 @@ const bMap: Map<string, HTMLInputElement> = new Map([
   ['b4', document.getElementById('b4') as HTMLInputElement],
 ])
 
-switch (process.env.CURRENT_USER) {
-  case 'A':
-    a.className = "current";
-    aMap.forEach((el, id) =>
-      el.addEventListener('click', () => toggleNote(id, el))
-    );
-    b.className = "other";
-    bMap.forEach(el => el.disabled = true)
-    break;
-  case 'B':
-    b.className = "current";
-    bMap.forEach((el, id) =>
-      el.addEventListener('click', () => toggleNote(id, el))
-    );
-    a.className = "other";
-    aMap.forEach(el => el.disabled = true)
-    break;
-  default:
-    alert('Invalid user. Set the CURRENT_USER to A or B in .env')
+const transportMap: Map<string, HTMLElement> = new Map([
+  ['t1', document.getElementById('t1')],
+  ['t2', document.getElementById('t2')],
+  ['t3', document.getElementById('t3')],
+  ['t4', document.getElementById('t4')],
+])
+
+
+/**
+ * User selection. Set user from environment at initialization,
+ * and update user when selected from the UI.
+ */
+
+function setUser(user: string) {
+  switch (user) {
+    case 'A':
+      a.className = "current";
+      aMap.forEach((el, id) => {
+        el.addEventListener('click', () => toggleNote(id, el));
+        el.disabled = false;
+      });
+      b.className = "other";
+      bMap.forEach(el => el.disabled = true);
+      break;
+    case 'B':
+      b.className = "current";
+      bMap.forEach((el, id) => {
+        el.addEventListener('click', () => toggleNote(id, el));
+        el.disabled = false;
+      });
+      a.className = "other";
+      aMap.forEach(el => el.disabled = true);
+      break;
+    default:
+      alert('Invalid user. Set the CURRENT_USER to A or B in .env');
+  }
 }
+
+setUser(process.env.CURRENT_USER);
+
+document.getElementById('select-user').addEventListener('change', event => {
+  const user = (event.target as HTMLInputElement).value;
+  setUser(user);
+})
+
+
+/**
+ * Open websocket connection. Set up callback for incoming messages
+ */
 
 const websocket = new WebSocketConnection(receiveChanges)
 
+
 /**
- * Note data, local and cache with latest from server
+ * Initialize local data and server data.
  */
 
 let localData: Notes = {
@@ -130,7 +153,7 @@ function sendChanges() {
   websocket.send(localData);
 }
 
-function receiveChanges (notes: Notes) {
+function receiveChanges(notes: Notes) {
   console.log('server data:', notes)
   serverData = notes;
 }
