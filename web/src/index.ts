@@ -85,14 +85,14 @@ const websocket = new WebSocketConnection(receiveChanges)
  * Initialize local data and server data.
  */
 
-let localData: Notes = {
-  A: { 1: false, 2: false, 3: false, 4: false },
-  B: { 1: false, 2: false, 3: false, 4: false }
+let localData: Session = {
+  A: { mtime: 0, notes: { 1: false, 2: false, 3: false, 4: false } },
+  B: { mtime: 0, notes: { 1: false, 2: false, 3: false, 4: false } }
 };
 
-let serverData: Notes = {
-  A: { 1: false, 2: false, 3: false, 4: false },
-  B: { 1: false, 2: false, 3: false, 4: false }
+let serverData: Session = {
+  A: { mtime: 0, notes: { 1: false, 2: false, 3: false, 4: false } },
+  B: { mtime: 0, notes: { 1: false, 2: false, 3: false, 4: false } }
 };
 
 /**
@@ -105,11 +105,13 @@ function toggleNote(id: string, el: HTMLInputElement) {
   const [current, note] = [...id];
   switch (current) {
     case 'a':
-      localData.A[+note] = !localData.A[note];
+      localData.A.notes[+note] = !localData.A[note];
+      localData.A.mtime = Date.now();
       break;
 
     case 'b':
-      localData.B[+note] = !localData.B[note];
+      localData.B.notes[+note] = !localData.B[note];
+      localData.B.mtime = Date.now();
       break;
 
     default:
@@ -134,9 +136,10 @@ function updateInterval(): number {
   // console.log('drift', drift);
   // console.log('next', now + 1 + drift);
 
+  // zero indexed count -- this is the penultimate note
   if (count === 2) {
     console.log('updating local data and sending changes');
-    localData = serverData;
+    syncLocalData(localData, serverData);
     sendChanges();
   }
 
@@ -153,9 +156,19 @@ function sendChanges() {
   websocket.send(localData);
 }
 
-function receiveChanges(notes: Notes) {
-  console.log('server data:', notes)
-  serverData = notes;
+function receiveChanges(session: Session) {
+  console.log('server data:', session)
+  serverData = session;
+}
+
+function syncLocalData(localData: Session, serverData: Session) {
+  if (localData.A.mtime < serverData.A.mtime) {
+    localData.A = serverData.A;
+  }
+
+  if (localData.B.mtime < serverData.B.mtime) {
+    localData.B = serverData.B;
+  }
 }
 
 function updateTransport() {

@@ -27,7 +27,7 @@ export class WebSocketConnection {
     }
   }
 
-  send(notes: Notes) {
+  send(notes: Session) {
     if (this.isAlive) {
       this.websocket.send(JSON.stringify(notes));
     } else {
