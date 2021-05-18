@@ -1,0 +1,78 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <title>Clock Sync POC</title>
+  <link rel="stylesheet" href="https://cdn.rawgit.com/kimeiga/bahunya/css/bahunya-0.1.3.css" />
+  <script defer src="index.ts"></script>
+  <style>
+    #transport button {
+      background-color: #363636;
+    }
+
+    #transport button.active {
+      background-color: #790505;
+    }
+
+    .current .active {
+      background-color: #ff9900;
+    }
+
+    .other button {
+      background-color: #8f849a;
+    }
+
+    .other .active {
+      background-color: #7c73ab;
+    }
+
+    #select-user {
+      color: white;
+      background-color: #404040;
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>
+    You need to enable JavaScript to run this app.
+  </noscript>
+  <header>
+    <h2>Clock Sync POC</h2>
+  </header>
+  <main>
+    <article>
+      <section id="a">
+        <button id="a1"></button>
+        <button id="a2"></button>
+        <button id="a3"></button>
+        <button id="a4"></button>
+        <code>A</code>
+      </section>
+      <section id="b">
+        <button id="b1"></button>
+        <button id="b2"></button>
+        <button id="b3"></button>
+        <button id="b4"></button>
+        <code>B</code>
+      </section>
+      <section id="transport">
+        <button id="t1" class="active" disabled></button>
+        <button id="t2" disabled></button>
+        <button id="t3" disabled></button>
+        <button id="t4" disabled></button>
+      </section>
+    </article>
+    <article>
+      <button id="start">Start</button>
+      <button id="stop">Stop</button>
+      <select id="select-user" name="user">
+        <option value="A">A</option>
+        <option value="B">B</option>
+      </select>
+    </article>
+  </main>
+</body>
+
+</html>
